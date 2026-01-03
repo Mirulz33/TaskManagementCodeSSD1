@@ -1,5 +1,5 @@
-herd  as server
-npm 
+herd  as a web server
+ 
 PHP 8.3
 npm 10 and owanrds
 composer
