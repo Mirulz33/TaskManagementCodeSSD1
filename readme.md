@@ -1,5 +1,6 @@
 herd  as a web server
- 
+
+Use laravel 12
 PHP 8.3
 npm 10 and owanrds
 composer
