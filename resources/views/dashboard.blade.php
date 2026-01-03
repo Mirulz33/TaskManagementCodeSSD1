@@ -27,6 +27,10 @@
                     <a href="{{ route('audit.logs') }}" class="bg-gray-600 text-white px-4 py-2 rounded">
                         Audit Logs
                     </a>
+                    <!-- ✅ New Manage Users button -->
+                    <a href="{{ route('admin.users.index') }}" class="bg-red-600 text-white px-4 py-2 rounded">
+                        Manage Users
+                    </a>
                 </div>
             @endif
 
