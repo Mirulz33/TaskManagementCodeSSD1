@@ -6,55 +6,42 @@ use App\Models\Task;
 use App\Models\User;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
     // Show all tasks
-    public function index(): View
+    public function index()
     {
-        /** @var \App\Models\User $authUser */
         $authUser = Auth::user();
 
         if ($authUser->role === 'admin') {
-            // Admin sees all tasks
             $tasks = Task::with('user')->latest()->get();
         } else {
-            // Standard user sees only assigned tasks
             $tasks = Task::with('user')
-                ->where('user_id', $authUser->id)
-                ->latest()
-                ->get();
+                        ->where('user_id', $authUser->id)
+                        ->latest()
+                        ->get();
         }
 
         return view('tasks.index', compact('tasks'));
     }
 
-    // Show form to create task (Admin only)
-    public function create(): View
+    // Show create form (Admin only)
+    public function create()
     {
-        /** @var \App\Models\User $authUser */
         $authUser = Auth::user();
-
-        if ($authUser->role !== 'admin') {
-            abort(403);
-        }
+        if ($authUser->role !== 'admin') abort(403);
 
         $users = User::where('role', 'user')->get();
         return view('tasks.create', compact('users'));
     }
 
     // Store new task (Admin only)
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
-        /** @var \App\Models\User $authUser */
         $authUser = Auth::user();
-
-        if ($authUser->role !== 'admin') {
-            abort(403);
-        }
+        if ($authUser->role !== 'admin') abort(403);
 
         $request->validate([
             'title' => 'required|string|max:255',
@@ -82,35 +69,32 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
     }
 
-    // Show edit form (Admin only)
-    public function edit(Task $task): View
+    // Edit task form (Admin only)
+    public function edit(Task $task)
     {
-        /** @var \App\Models\User $authUser */
         $authUser = Auth::user();
+        if ($authUser->role !== 'admin') abort(403);
 
-        if ($authUser->role !== 'admin') {
-            abort(403);
+        $users = User::where('role', 'user')->get();
+
+        if (!$task) {
+            return redirect()->route('tasks.index')->with('error', 'Task not found.');
         }
 
-        $users = User::where('role','user')->get();
         return view('tasks.edit', compact('task', 'users'));
     }
 
     // Update task (Admin only)
-    public function update(Request $request, Task $task): RedirectResponse
+    public function update(Request $request, Task $task)
     {
-        /** @var \App\Models\User $authUser */
         $authUser = Auth::user();
-
-        if ($authUser->role !== 'admin') {
-            abort(403);
-        }
+        if ($authUser->role !== 'admin') abort(403);
 
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'user_id' => 'required|exists:users,id',
-            'status' => 'required|string',
+            'status' => 'required|string|in:pending,in-progress,completed',
         ]);
 
         $task->update([
@@ -133,19 +117,13 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
 
-    // Standard user: update status only
-    public function updateStatus(Request $request, Task $task): RedirectResponse
+    // Update status (Standard user only)
+    public function updateStatus(Request $request, Task $task)
     {
-        /** @var \App\Models\User $authUser */
         $authUser = Auth::user();
+        if ($task->user_id !== $authUser->id) abort(403);
 
-        if ($task->user_id !== $authUser->id) {
-            abort(403);
-        }
-
-        $request->validate([
-            'status' => 'required|string',
-        ]);
+        $request->validate(['status' => 'required|string|in:pending,in-progress,completed']);
 
         $task->update(['status' => $request->status]);
 
@@ -162,14 +140,10 @@ class TaskController extends Controller
     }
 
     // Delete task (Admin only)
-    public function destroy(Task $task): RedirectResponse
+    public function destroy(Task $task)
     {
-        /** @var \App\Models\User $authUser */
         $authUser = Auth::user();
-
-        if ($authUser->role !== 'admin') {
-            abort(403);
-        }
+        if ($authUser->role !== 'admin') abort(403);
 
         $title = $task->title;
         $description = $task->description;
@@ -188,6 +162,6 @@ class TaskController extends Controller
             'ip_address' => request()->ip(),
         ]);
 
-        return redirect()->back()->with('success', 'Task deleted successfully.');
+        return redirect()->route('tasks.index')->with('success', 'Task deleted successfully.');
     }
 }

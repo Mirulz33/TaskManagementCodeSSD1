@@ -46,7 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Tasks (User)
+    // Tasks (User can only update status)
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::put('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.update.status');
 });
@@ -71,16 +71,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
-    // Users Management (block/unblock/delete)
+    // Users Management
     Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
     Route::put('/admin/users/{user}/block', [AdminUserController::class, 'block'])->name('admin.users.block');
     Route::put('/admin/users/{user}/unblock', [AdminUserController::class, 'unblock'])->name('admin.users.unblock');
     Route::delete('/admin/users/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Auth Routes
-|--------------------------------------------------------------------------
-*/
 require __DIR__ . '/auth.php';
