@@ -1,4 +1,12 @@
-herd  as a web server
+Project description
+The Task Management System is a web application developed using Laravel 12. It allows users to create, view, update, and delete tasks efficiently. Users can manage their tasks in an organized way, set priorities, and track progress.
+
+The system includes user authentication, ensuring that each user can only access their own tasks. It also implements security features such as input validation, CSRF protection, and role-based access control to prevent unauthorized actions.
+
+Overall, the system helps users stay organized, improve productivity, and manage tasks easily.
+
+use herd  as a web server
+
 
 Use laravel 12
 PHP 8.3
