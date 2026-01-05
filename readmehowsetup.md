@@ -9,19 +9,32 @@ use herd  as a web server
 
 
 Use laravel 12
+
 PHP 8.3
+
 npm 10 and owanrds
+
 composer
+
 SQLite
 
+
 1 After install the code run:
+
 composer install
+
 cp .env.example .env
+
 php artisan key:generate
+
 php artisan migrate
+
 php artisan optimize:clear
+
 npm install
+
 npm run build
+
 
 
 2 After wanted to make some configuration 
