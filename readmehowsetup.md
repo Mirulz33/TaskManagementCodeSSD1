@@ -6,7 +6,6 @@ The system includes user authentication, ensuring that each user can only access
 Overall, the system helps users stay organized, improve productivity, and manage tasks easily.
 
 Dependencies:
-
 use herd  as a web server
 
 Use laravel 12
