@@ -5,8 +5,9 @@ The system includes user authentication, ensuring that each user can only access
 
 Overall, the system helps users stay organized, improve productivity, and manage tasks easily.
 
-use herd  as a web server
+Dependencies:
 
+use herd  as a web server
 
 Use laravel 12
 
@@ -20,19 +21,12 @@ SQLite
 
 
 1 After install the code run:
-
 composer install
-
 cp .env.example .env
-
 php artisan key:generate
-
 php artisan migrate
-
 php artisan optimize:clear
-
 npm install
-
 npm run build
 
 
