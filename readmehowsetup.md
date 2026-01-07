@@ -32,6 +32,8 @@ php artisan key:generate
 
 php artisan migrate
 
+php artisan migrate:fresh --seed
+
 php artisan optimize:clear
 
 npm install
@@ -54,7 +56,7 @@ php artisan view:clear
 
 php artisan optimize:clear
 
-php artisan migrate:fresh --seed
+
 
 #check the connection to database
 
