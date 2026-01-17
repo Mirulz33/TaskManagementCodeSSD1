@@ -8,9 +8,17 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+            {{-- Success Message --}}
             @if(session('success'))
                 <div class="mb-4 p-4 bg-green-100 text-green-700 rounded">
                     {{ session('success') }}
+                </div>
+            @endif
+
+            {{-- Error Message --}}
+            @if(session('error'))
+                <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
+                    {{ session('error') }}
                 </div>
             @endif
 
@@ -40,26 +48,68 @@
                                         <span class="text-green-600 font-semibold">No</span>
                                     @endif
                                 </td>
-                                <td class="border px-4 py-2 space-x-2">
 
-                                    @if(!$user->is_blocked)
-                                        <form method="POST" action="{{ route('admin.users.block', $user->id) }}" class="inline">
+                                <td class="border px-4 py-2 flex flex-wrap gap-2">
+
+                                    {{-- ✅ Promote (Green) --}}
+                                    @if($user->role === 'standard')
+                                        <form method="POST"
+                                              action="{{ route('admin.users.promote', $user->id) }}"
+                                              class="inline">
                                             @csrf
                                             @method('PUT')
-                                            <button class="bg-red-600 text-white px-2 py-1 rounded">Block</button>
-                                        </form>
-                                    @else
-                                        <form method="POST" action="{{ route('admin.users.unblock', $user->id) }}" class="inline">
-                                            @csrf
-                                            @method('PUT')
-                                            <button class="bg-green-600 text-white px-2 py-1 rounded">Unblock</button>
+                                            <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow">
+                                                Promote
+                                            </button>
                                         </form>
                                     @endif
 
-                                    <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}" class="inline" onsubmit="return confirm('Are you sure?')">
+                                    {{-- ✅ Demote (Yellow/Orange) --}}
+                                    @if($user->role === 'super_user')
+                                        <form method="POST"
+                                              action="{{ route('admin.users.demote', $user->id) }}"
+                                              class="inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded shadow">
+                                                Demote
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    {{-- Block / Unblock --}}
+                                    @if(!$user->is_blocked)
+                                        <form method="POST"
+                                              action="{{ route('admin.users.block', $user->id) }}"
+                                              class="inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded shadow">
+                                                Block
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form method="POST"
+                                              action="{{ route('admin.users.unblock', $user->id) }}"
+                                              class="inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow">
+                                                Unblock
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    {{-- Delete --}}
+                                    <form method="POST"
+                                          action="{{ route('admin.users.destroy', $user->id) }}"
+                                          class="inline"
+                                          onsubmit="return confirm('Are you sure? you want to archive this user?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="bg-gray-600 text-white px-2 py-1 rounded">Delete</button>
+                                        <button class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded shadow">
+                                            Delete
+                                        </button>
                                     </form>
 
                                 </td>

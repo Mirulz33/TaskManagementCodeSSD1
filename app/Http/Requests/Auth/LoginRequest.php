@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -12,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 class LoginRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Allow all users to make this request.
      */
     public function authorize(): bool
     {
@@ -20,61 +21,64 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * Validation rules for login.
      */
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'email'    => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
         ];
     }
 
     /**
-     * Attempt to authenticate the request's credentials.
+     * Handle authentication attempt.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function authenticate(): void
     {
+        // Check if user exceeded login attempts
         $this->ensureIsNotRateLimited();
 
         $credentials = $this->only('email', 'password');
 
-        // Fetch the user first
-        $user = \App\Models\User::where('email', $credentials['email'])->first();
+        // Get user by email
+        $user = User::where('email', $credentials['email'])->first();
 
-        // Check if user is blocked
+        // Admin-level block check
         if ($user && $user->is_blocked) {
             throw ValidationException::withMessages([
                 'email' => 'Your account has been blocked by the administrator.',
             ]);
         }
 
+        // Failed login attempt
         if (! Auth::attempt($credentials, $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+
+            // Lock for 15 minutes (900 seconds)
+            RateLimiter::hit($this->throttleKey(), 900);
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
         }
 
+        // Successful login → reset limiter
         RateLimiter::clear($this->throttleKey());
     }
 
     /**
-     * Ensure the login request is not rate limited.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Check rate limit before authentication.
      */
     public function ensureIsNotRateLimited(): void
     {
+        // Allow only 5 attempts
         if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 
+        // Fire lockout event
         event(new Lockout($this));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
@@ -88,10 +92,10 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the rate limiting throttle key for the request.
+     * Generate unique throttle key (email + IP).
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::lower($this->input('email')) . '|' . $this->ip();
     }
 }

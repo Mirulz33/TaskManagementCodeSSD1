@@ -8,15 +8,16 @@ use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest
 {
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                // Block script tags & SQL keywords
+                'regex:/^(?!.*(<script|<\/script>|select\s|insert\s|delete\s|update\s|drop\s)).*$/i',
+            ],
             'email' => [
                 'required',
                 'string',
@@ -25,6 +26,13 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.regex' => 'Your input contains invalid characters.',
         ];
     }
 }

@@ -5,7 +5,7 @@
 
     <div class="p-6">
 
-        @if(auth()->user()->role === 'admin')
+        @if(auth()->user()->canManageTasks())
             <a href="{{ route('tasks.create') }}"
                class="bg-blue-600 text-white px-4 py-2 rounded mb-4 inline-block">
                 Create New Task
@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="flex gap-2">
-                    @if(auth()->user()->role === 'admin')
+                    @if(auth()->user()->canManageTasks())
                         <a href="{{ route('tasks.edit', $task->id) }}" class="text-blue-600">Edit</a>
 
                         <form method="POST" action="{{ route('tasks.destroy', $task->id) }}">
