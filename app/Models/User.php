@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes; // <-- add this
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes; // <-- add SoftDeletes
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -48,6 +48,7 @@ class User extends Authenticatable
 
     public function canManageTasks(): bool
     {
+        // Admin and Super User can create/manage tasks
         return in_array($this->role, ['admin', 'super_user'], true);
     }
 

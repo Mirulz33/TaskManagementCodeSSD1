@@ -18,8 +18,8 @@
             </div>
         @endif
 
-        {{-- ADMIN ONLY --}}
-        @if(auth()->user()->role === 'admin')
+        {{-- ADMIN + SUPER USER --}}
+        @if(auth()->user()->canManageTasks())
         <form method="POST" action="{{ route('tasks.store') }}">
             @csrf
 
