@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Task;
 
 class User extends Authenticatable
 {
@@ -65,7 +66,7 @@ class User extends Authenticatable
         return false;
     }
 
-    /* ================= RELATIONS ================= */
+    /* ================= RELATIONSHIPS ================= */
 
     public function tasks()
     {
